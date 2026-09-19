@@ -1,3 +1,5 @@
+import type { CSSProperties } from 'react';
+
 export function AppleLogo({ className = '' }: { className?: string }) {
   return (
     <svg viewBox="0 0 24 24" className={className} fill="currentColor" aria-hidden="true">
@@ -6,9 +8,15 @@ export function AppleLogo({ className = '' }: { className?: string }) {
   );
 }
 
-export function FolderGlyph({ className = '' }: { className?: string }) {
+export function FolderGlyph({
+  className = '',
+  style,
+}: {
+  className?: string;
+  style?: CSSProperties;
+}) {
   return (
-    <svg viewBox="0 0 120 96" className={className} aria-hidden="true">
+    <svg viewBox="0 0 120 96" className={className} style={style} aria-hidden="true">
       <defs>
         <linearGradient id="folderTab" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0" stopColor="#6ec2f7" />
@@ -29,9 +37,15 @@ export function FolderGlyph({ className = '' }: { className?: string }) {
   );
 }
 
-export function HardDriveGlyph({ className = '' }: { className?: string }) {
+export function HardDriveGlyph({
+  className = '',
+  style,
+}: {
+  className?: string;
+  style?: CSSProperties;
+}) {
   return (
-    <svg viewBox="0 0 120 96" className={className} aria-hidden="true">
+    <svg viewBox="0 0 120 96" className={className} style={style} aria-hidden="true">
       <defs>
         <linearGradient id="hdShell" x1="0.1" y1="0" x2="0.9" y2="1">
           <stop offset="0" stopColor="#e6e8ea" />

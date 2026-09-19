@@ -1,60 +1,104 @@
 import { useState } from 'react';
+import { folders, type FolderId } from '../content';
+import type { Viewport } from '../hooks/useViewport';
 import { FolderGlyph, HardDriveGlyph } from './Glyphs';
+import { play } from '../lib/sound';
 
-const FOLDERS = [
-  'About Me',
-  'Education',
-  'Experience',
-  'Case Studies',
-  'Projects',
-  'Certifications',
-  'Skills',
-  'Contact',
-];
+type Props = {
+  active: boolean;
+  vp: Viewport;
+  onOpen: (id: FolderId) => void;
+};
 
-export default function DesktopIcons({ active }: { active: boolean }) {
+export default function DesktopIcons({ active, vp, onOpen }: Props) {
   const [selected, setSelected] = useState<string | null>(null);
 
+  // One tap opens on touch; on a pointer device a double click does, like Finder.
+  const openProps = (id: FolderId, name: string) =>
+    vp.touch
+      ? {
+          onClick: () => {
+            play('click');
+            onOpen(id);
+          },
+        }
+      : {
+          onClick: () => {
+            play('click');
+            setSelected(name);
+          },
+          onDoubleClick: () => onOpen(id),
+        };
+
+  const cell = { width: vp.iconCell };
+  const glyph = { height: vp.icon, width: vp.icon * 1.26 };
+
   return (
-    <div className="absolute right-4 top-9 z-10 flex items-start gap-1">
-      <div className="grid grid-cols-2 gap-x-2 gap-y-3">
-        {FOLDERS.map((name, i) => (
+    <div
+      className="absolute z-10 flex items-start gap-1"
+      style={{ top: vp.barH + 8, right: vp.tiny ? 6 : 16 }}
+    >
+      <div className={`grid gap-x-1 ${vp.tiny ? 'grid-cols-2 gap-y-1' : 'grid-cols-2 gap-y-3'}`}>
+        {folders.map((f, i) => (
           <button
-            key={name}
+            key={f.id}
             type="button"
-            onClick={() => setSelected(name)}
-            onDoubleClick={() => setSelected(name)}
-            className={`group flex w-[108px] flex-col items-center rounded-lg px-1 pb-1 pt-1.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white/80 ${active ? 'animate-iconIn' : 'opacity-0'}`}
-            style={{ animationDelay: `${160 + i * 90}ms` }}
+            {...openProps(f.id, f.name)}
+            style={{ ...cell, animationDelay: `${160 + i * 90}ms` }}
+            className={`group flex flex-col items-center rounded-lg px-1 pb-1 pt-1.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white/80 ${
+              active ? 'animate-iconIn' : 'opacity-0'
+            }`}
           >
-            <FolderGlyph className="h-[62px] w-[78px] drop-shadow-[0_1px_2px_rgba(0,0,0,0.28)]" />
+            <FolderGlyph
+              style={glyph}
+              className="drop-shadow-[0_1px_2px_rgba(0,0,0,0.28)] transition-transform group-active:scale-95"
+            />
             <span
-              className={`mt-1 max-w-full truncate rounded px-1.5 py-[1px] text-[13px] leading-[16px] ${
-                selected === name
+              style={{ fontSize: vp.iconLabel }}
+              className={`mt-1 max-w-full rounded px-1.5 py-[1px] leading-[1.25] ${
+                vp.tiny ? 'text-center' : 'truncate'
+              } ${
+                selected === f.name
                   ? 'bg-[#3d76d6] text-white'
                   : 'text-[#111318] [text-shadow:0_1px_2px_rgba(255,255,255,0.45)]'
               }`}
             >
-              {name}
+              {f.name}
             </span>
           </button>
         ))}
       </div>
 
-      <button
-        type="button"
-        onClick={() => setSelected('Macintosh HD')}
-        className={`flex w-[108px] flex-col items-center rounded-lg px-1 pb-1 pt-1.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white/80 ${active ? 'animate-iconIn' : 'opacity-0'}`}
-        style={{ animationDelay: '60ms' }}
-      >
-        <HardDriveGlyph className="h-[62px] w-[78px] drop-shadow-[0_1px_2px_rgba(0,0,0,0.28)]" />
-        <span className="mt-1 text-[13px] leading-[16px] text-[#111318] [text-shadow:0_1px_2px_rgba(255,255,255,0.45)]">
-          Macintosh HD
-        </span>
-        <span className="mt-[2px] max-w-full truncate rounded-[4px] bg-white/90 px-1.5 py-[1px] text-[12px] leading-[15px] text-[#111318] shadow-[0_0_0_1px_rgba(0,0,0,0.12)]">
-          Your Future…
-        </span>
-      </button>
+      {!vp.tiny && (
+        <button
+          type="button"
+          onClick={() => {
+            play('click');
+            setSelected('Macintosh HD');
+          }}
+          style={{ ...cell, animationDelay: '60ms' }}
+          className={`flex flex-col items-center rounded-lg px-1 pb-1 pt-1.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white/80 ${
+            active ? 'animate-iconIn' : 'opacity-0'
+          }`}
+        >
+          <HardDriveGlyph
+            style={glyph}
+            className="drop-shadow-[0_1px_2px_rgba(0,0,0,0.28)]"
+          />
+          <span
+            style={{ fontSize: vp.iconLabel }}
+            className="mt-1 leading-[1.25] text-[#111318] [text-shadow:0_1px_2px_rgba(255,255,255,0.45)]"
+          >
+            Macintosh HD
+          </span>
+          <span
+            style={{ fontSize: vp.iconLabel - 1 }}
+            className="mt-[2px] max-w-full truncate rounded-[4px] bg-white/90 px-1.5 py-[1px] leading-[1.25] text-[#111318] shadow-[0_0_0_1px_rgba(0,0,0,0.12)]"
+          >
+            Your Future…
+          </span>
+        </button>
+      )}
     </div>
   );
 }

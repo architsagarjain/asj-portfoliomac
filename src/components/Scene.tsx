@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 import Desktop from './Desktop';
+import useViewport from '../hooks/useViewport';
 import RetroMac from './RetroMac';
 
 /**
@@ -10,8 +11,9 @@ import RetroMac from './RetroMac';
  */
 const WELL = { cx: 0.5003, cy: 0.3719, maxW: 0.2458, maxH: 0.2976 };
 
-/** How far you scroll to complete the zoom. */
-const TRACK = 3.2;
+/** How far you scroll to complete the zoom: shorter on phones. */
+const TRACK_WIDE = 3.2;
+const TRACK_COMPACT = 2.1;
 
 const clamp = (n: number) => Math.min(1, Math.max(0, n));
 
@@ -78,6 +80,7 @@ function measure(): Frame {
 }
 
 export default function Scene() {
+  const vp = useViewport();
   const trackRef = useRef<HTMLDivElement>(null);
   const [frame, setFrame] = useState<Frame | null>(null);
   const [p, setP] = useState(0);
@@ -127,7 +130,7 @@ export default function Scene() {
   const landed = p > 0.97;
 
   return (
-    <div ref={trackRef} style={{ height: `${TRACK * 100}vh` }}>
+    <div ref={trackRef} style={{ height: `${(vp.compact ? TRACK_COMPACT : TRACK_WIDE) * 100}vh` }}>
       <div className="sticky top-0 h-screen overflow-hidden bg-black">
         {frame && (
           <div
