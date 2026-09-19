@@ -8,7 +8,7 @@ import RetroMac from './RetroMac';
  * inside is sized to the viewport's own aspect ratio so the desktop is never
  * cropped or letterboxed on the way in — it simply grows.
  */
-const WELL = { cx: 0.5, cy: 0.389, maxW: 0.206, maxH: 0.246 };
+const WELL = { cx: 0.5003, cy: 0.3719, maxW: 0.2458, maxH: 0.2976 };
 
 /** How far you scroll to complete the zoom. */
 const TRACK = 3.2;
@@ -31,6 +31,10 @@ type Frame = {
   boxY: number;
   boxW: number;
   boxH: number;
+  openX: number;
+  openY: number;
+  openW: number;
+  openH: number;
   k: number;
 };
 
@@ -45,7 +49,12 @@ function measure(): Frame {
   const boxY = (vh - boxH) / 2;
 
   const aspect = vw / vh;
-  const glassW = Math.min(WELL.maxW * boxW, WELL.maxH * boxH * aspect);
+  const openW = WELL.maxW * boxW;
+  const openH = WELL.maxH * boxH;
+
+  // The desktop keeps the viewport's aspect and sits inside the tube opening,
+  // so it is never cropped or squashed on the way in.
+  const glassW = Math.min(openW, openH * aspect);
   const glassH = glassW / aspect;
 
   return {
@@ -55,6 +64,10 @@ function measure(): Frame {
     boxY,
     boxW,
     boxH,
+    openX: boxX + WELL.cx * boxW - openW / 2,
+    openY: boxY + WELL.cy * boxH - openH / 2,
+    openW,
+    openH,
     glassX: boxX + WELL.cx * boxW - glassW / 2,
     glassY: boxY + WELL.cy * boxH - glassH / 2,
     glassW,
@@ -127,7 +140,7 @@ export default function Scene() {
             }}
           >
             <RetroMac
-              className="absolute"
+              className="absolute select-none"
               style={{
                 left: frame.boxX,
                 top: frame.boxY,
@@ -137,16 +150,17 @@ export default function Scene() {
               }}
             />
 
+            {/* masks the still's own screen content, and reads as tube mask */}
             <div
-              className="absolute rounded-[10px]"
+              className="absolute rounded-[8px]"
               style={{
-                left: frame.glassX - frame.glassW * 0.035,
-                top: frame.glassY - frame.glassW * 0.035,
-                width: frame.glassW * 1.07,
-                height: frame.glassH + frame.glassW * 0.07,
+                left: frame.openX,
+                top: frame.openY,
+                width: frame.openW,
+                height: frame.openH,
                 opacity: chassis,
-                background: 'linear-gradient(180deg,#3a3a3c,#151517)',
-                boxShadow: '0 2px 10px rgba(0,0,0,0.5)',
+                background: 'linear-gradient(180deg,#26262a,#0e0e11)',
+                boxShadow: 'inset 0 1px 2px rgba(255,255,255,0.12)',
               }}
             />
 

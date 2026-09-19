@@ -1,8 +1,11 @@
 # Archit Sagar Jain — portfolio landing page
 
 A pixel-faithful recreation of the macOS desktop landing screen from the
-reference video. No image assets: the wallpaper, Apple logo, folder and
-hard-drive icons are all hand-written SVG.
+reference video, entered through a scroll-driven zoom into a Macintosh.
+
+The Macintosh is one rendered still (`src/assets/macintosh.webp`, 35 kB).
+Everything else — wallpaper, Apple logo, folder and hard-drive icons, dock
+tiles — is hand-written SVG and CSS.
 
 ## Run
 
@@ -20,7 +23,7 @@ React 18 · TypeScript · Vite · Tailwind CSS · lucide-react
 | File | What it draws |
 | --- | --- |
 | `src/components/Scene.tsx` | The scroll-driven zoom. Owns scroll progress, the screen geometry, and the bezel/glass layers. |
-| `src/components/RetroMac.tsx` | The beige Macintosh the camera starts on, including the rainbow badge, floppy slot, coiled cable and tabletop reflection. |
+| `src/components/RetroMac.tsx` | The Macintosh the camera starts on — a rendered still at `src/assets/macintosh.webp`, positioned by Scene. |
 | `src/components/Desktop.tsx` | The desktop, always rendered at exactly one viewport. |
 | `src/components/Wallpaper.tsx` | Layered ridge wallpaper. Ridge colours and edge heights are sampled from the source frames (`#e6e9ee` at the top right down to `#272937` at the lower left). |
 | `src/components/MenuBar.tsx` | Apple logo, `Finder`, `File / Edit / View / Expect / Window / Help`, and the right cluster: battery, Wi-Fi, `9:41 AM`, search, Siri circle. |
@@ -42,10 +45,12 @@ scale that fits one viewport of desktop into that opening, so at `p = 1` the
 desktop sits at exactly 1:1 and fills the window. `tx` / `ty` walk the screen
 centre to the viewport centre over the same range.
 
-The opening is sized to the viewport's own aspect ratio rather than a fixed
-one, which is why the desktop is never cropped or letterboxed on the way in —
-it only grows. The bezel and glass are DOM layers rather than part of the SVG
-so they can follow that sizing.
+The tube opening in the still runs about 1.47:1. The live desktop is sized to
+the viewport's own aspect ratio and centred inside that opening, so it is never
+cropped or squashed on the way in — it only grows. A dark rounded panel covers
+the still's own screen content and shows through above and below the desktop,
+reading as tube mask. To re-derive that geometry for a different render, the
+opening's bounds are the `WELL` fractions at the top of `Scene.tsx`.
 
 Layered on top of the same `p`:
 
