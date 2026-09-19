@@ -40,9 +40,14 @@ type Frame = {
   k: number;
 };
 
-function measure(): Frame {
-  const vw = window.innerWidth;
-  const vh = window.innerHeight;
+/**
+ * Measured from the stage element rather than window.inner*: on browsers with
+ * a classic scrollbar (Windows, Linux) innerWidth includes the bar, so the
+ * artboard would be laid out ~17px wider than the box it renders in.
+ */
+function measure(stage: HTMLElement): Frame {
+  const vw = stage.clientWidth;
+  const vh = stage.clientHeight;
 
   // The artboard is 16:9 and covers the viewport, like background-size: cover.
   const boxW = Math.max(vw, (vh * 16) / 9);
@@ -82,20 +87,25 @@ function measure(): Frame {
 export default function Scene() {
   const vp = useViewport();
   const trackRef = useRef<HTMLDivElement>(null);
+  const stageRef = useRef<HTMLDivElement>(null);
   const [frame, setFrame] = useState<Frame | null>(null);
   const [p, setP] = useState(0);
 
   useLayoutEffect(() => {
-    const sync = () => setFrame(measure());
+    const stage = stageRef.current;
+    if (!stage) return;
+    const sync = () => setFrame(measure(stage));
     sync();
-    window.addEventListener('resize', sync);
-    return () => window.removeEventListener('resize', sync);
+    const ro = new ResizeObserver(sync);
+    ro.observe(stage);
+    return () => ro.disconnect();
   }, []);
 
   const read = useCallback(() => {
     const el = trackRef.current;
-    if (!el) return;
-    const travel = el.offsetHeight - window.innerHeight;
+    const stage = stageRef.current;
+    if (!el || !stage) return;
+    const travel = el.offsetHeight - stage.offsetHeight;
     setP(travel > 0 ? clamp(-el.getBoundingClientRect().top / travel) : 1);
   }, []);
 
@@ -131,7 +141,9 @@ export default function Scene() {
 
   return (
     <div ref={trackRef} style={{ height: `${(vp.compact ? TRACK_COMPACT : TRACK_WIDE) * 100}vh` }}>
-      <div className="sticky top-0 h-screen overflow-hidden bg-black">
+      {/* 100dvh tracks a phone's collapsing address bar so the landed desktop
+          (and its dock) is never hidden under it; h-screen is the fallback. */}
+      <div ref={stageRef} className="sticky top-0 h-screen overflow-hidden bg-black" style={{ height: '100dvh' }}>
         {frame && (
           <div
             className="absolute inset-0 will-change-transform"

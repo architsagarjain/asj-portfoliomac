@@ -19,7 +19,9 @@ export type Viewport = {
 };
 
 function read(): Viewport {
-  const w = typeof window === 'undefined' ? 1440 : window.innerWidth;
+  // clientWidth excludes a classic scrollbar, so the desktop is laid out at
+  // the width it is actually drawn in (Scene measures its stage the same way).
+  const w = typeof window === 'undefined' ? 1440 : document.documentElement.clientWidth;
   const h = typeof window === 'undefined' ? 900 : window.innerHeight;
   const tiny = w < 560;
   const compact = w < 900;

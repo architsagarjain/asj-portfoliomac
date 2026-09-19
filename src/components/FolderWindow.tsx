@@ -40,6 +40,10 @@ export default function FolderWindow({
 
   const onPointerDown = (e: React.PointerEvent) => {
     if (vp.compact) return;
+    // The traffic lights live inside the title bar. Capturing the pointer here
+    // would route their click to the bar instead of the button, so the close
+    // light never fired — let buttons handle their own press.
+    if ((e.target as HTMLElement).closest('button')) return;
     onFocus();
     drag.current = { dx: e.clientX - win.x, dy: e.clientY - win.y };
     (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
