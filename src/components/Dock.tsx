@@ -69,13 +69,15 @@ const APPS: App[] = [
   },
 ];
 
-function Tile({ app, delay }: { app: App; delay: number }) {
+function Tile({ app, delay, active }: { app: App; delay: number; active: boolean }) {
   const { Icon } = app;
   return (
     <button
       type="button"
       aria-label={app.name}
-      className="animate-dockIn group relative flex flex-col items-center"
+      className={`group relative flex flex-col items-center ${
+        active ? 'animate-dockIn' : 'opacity-0'
+      }`}
       style={{ animationDelay: `${delay}ms` }}
     >
       <span className="pointer-events-none absolute -top-9 whitespace-nowrap rounded-md bg-white/85 px-2 py-0.5 text-[12px] text-black/80 opacity-0 shadow backdrop-blur transition-opacity group-hover:opacity-100">
@@ -98,12 +100,12 @@ function Tile({ app, delay }: { app: App; delay: number }) {
   );
 }
 
-export default function Dock() {
+export default function Dock({ active }: { active: boolean }) {
   return (
     <div className="absolute inset-x-0 bottom-1.5 z-20 flex justify-center">
       <div className="flex items-end gap-2.5 rounded-[20px] border border-white/40 bg-white/40 px-2.5 pb-1 pt-2 shadow-[0_8px_28px_rgba(0,0,0,0.32)] backdrop-blur-2xl">
         {APPS.map((app, i) => (
-          <Tile key={app.name} app={app} delay={420 + i * 35} />
+          <Tile key={app.name} app={app} delay={420 + i * 35} active={active} />
         ))}
 
         <span className="mx-1 mb-3 h-[46px] w-px bg-black/20" aria-hidden="true" />
@@ -116,6 +118,7 @@ export default function Dock() {
             ink: '#ffffff',
           }}
           delay={870}
+          active={active}
         />
         <Tile
           app={{
@@ -125,6 +128,7 @@ export default function Dock() {
             ink: '#4a4f58',
           }}
           delay={905}
+          active={active}
         />
       </div>
     </div>

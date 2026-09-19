@@ -3,9 +3,9 @@ import { AppleLogo } from './Glyphs';
 
 const MENUS = ['File', 'Edit', 'View', 'Expect', 'Window', 'Help'];
 
-export default function MenuBar() {
+export default function MenuBar({ active }: { active: boolean }) {
   return (
-    <header className="animate-barIn absolute inset-x-0 top-0 z-30 flex h-7 items-center justify-between bg-white/55 px-3 text-[13px] text-black/85 backdrop-blur-xl">
+    <header className={`absolute inset-x-0 top-0 z-30 flex h-7 items-center justify-between bg-white/55 px-3 text-[13px] text-black/85 backdrop-blur-xl ${active ? 'animate-barIn' : 'opacity-0'}`}>
       <nav className="flex items-center gap-4">
         <button
           type="button"

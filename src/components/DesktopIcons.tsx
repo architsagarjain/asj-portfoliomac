@@ -12,7 +12,7 @@ const FOLDERS = [
   'Contact',
 ];
 
-export default function DesktopIcons() {
+export default function DesktopIcons({ active }: { active: boolean }) {
   const [selected, setSelected] = useState<string | null>(null);
 
   return (
@@ -24,7 +24,7 @@ export default function DesktopIcons() {
             type="button"
             onClick={() => setSelected(name)}
             onDoubleClick={() => setSelected(name)}
-            className="animate-iconIn group flex w-[108px] flex-col items-center rounded-lg px-1 pb-1 pt-1.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white/80"
+            className={`group flex w-[108px] flex-col items-center rounded-lg px-1 pb-1 pt-1.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white/80 ${active ? 'animate-iconIn' : 'opacity-0'}`}
             style={{ animationDelay: `${160 + i * 90}ms` }}
           >
             <FolderGlyph className="h-[62px] w-[78px] drop-shadow-[0_1px_2px_rgba(0,0,0,0.28)]" />
@@ -44,7 +44,7 @@ export default function DesktopIcons() {
       <button
         type="button"
         onClick={() => setSelected('Macintosh HD')}
-        className="animate-iconIn flex w-[108px] flex-col items-center rounded-lg px-1 pb-1 pt-1.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white/80"
+        className={`flex w-[108px] flex-col items-center rounded-lg px-1 pb-1 pt-1.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white/80 ${active ? 'animate-iconIn' : 'opacity-0'}`}
         style={{ animationDelay: '60ms' }}
       >
         <HardDriveGlyph className="h-[62px] w-[78px] drop-shadow-[0_1px_2px_rgba(0,0,0,0.28)]" />
